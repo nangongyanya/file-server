@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+    <title>文件服务器</title>
+    <link rel="stylesheet" type="text/css" href="../css/bootstrap.min.css" th:href="@{/css/bootstrap.min.css}">
+</head>
+<body>
+    <nav class="navbar navbar-default" role="navigation">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="#">MONGODB FILE SERVER</a>
+            </div>
+        </div>
+    </nav>
+
+    <!--<div class="alert alert-success" th:if="${message}" th:text="${message}></div>-->
+
+    <div>
+        <form class="form-inline" enctype="multipart/form-data" method="post" action="/upload">
+            <div class="form-group">
+                <label class="sr-only" for="inputfile">文件输入</label>
+                <input type="file" name="file" id="inputfile">
+            </div>
+            <button type="submit" class="btn btn-default">上传</button>
+        </form>
+
+        <hr />
+
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>名称</th>
+                    <th>ID</th>
+                    <th>文件类型</th>
+                    <th>文件大小</th>
+                    <th>上传时间</th>
+                    <th>MD5</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="file : ${files}">
+                    <td>
+                        <a href="javascript:void(0);" id="showOnline" th:text="${#strings.abbreviate(file.name,20)}"
+                           th:onclick="'javascript:showOnline(\''+${file.id}+'\');'"/>
+                    </td>
+                    <td th:text="${file.id}" ></td>
+                    <td th:text="${file.contentType}" ></td>
+                    <td th:text="${file.size}" ></td>
+                    <td th:text="${#dates.format(file.uploadDate, 'yyyy-MM-dd HH:mm:ss')}" ></td>
+                    <td th:text="${file.md5}" ></td>
+                    <td>
+                        <a href="javascript:void(0);" id="downloadOnline"
+                           th:onclick="'javascript:downloadOnline(\''+${file.id}+'\');'">下载</a>
+                        <a href="javascript:void(0);" id="deleteOnline"
+                           th:onclick="'javascript:deleteOnline(\''+${file.id}+'\');'"> | 删除</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <script type="text/javascript" src="../js/jquery-3.1.1.min.js" th:src="@{/js/jquery-3.1.1.min.js}"></script>
+    <script type="text/javascript" src="../js/bootstrap.js" th:src="@{/js/bootstrap.js}"></script>
+    <script>
+        // 在线查看图片
+        function showOnline(id) {
+            window.open("/view/" + id);
+        }
+
+        // 在线下载图片
+        function downloadOnline(id) {
+            location.href = "/download/" + id;
+        }
+
+        // 删除图片
+        function deleteOnline(id) {
+            $.ajax({
+                url: "/delete/" + id,
+                type: 'DELETE',
+                success: function (data) {
+                    alert("删除成功！");
+                    location.reload();
+                },
+                error: function () {
+                    alert("删除失败！");
+                }
+            });
+        }
+
+        // DOM 加载完再执行
+        $(function() {
+        });
+    </script>
+</body>
+</html>
